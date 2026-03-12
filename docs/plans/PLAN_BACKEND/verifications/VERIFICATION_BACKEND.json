@@ -1,0 +1,203 @@
+{
+  "verification_name": "VERIFICATION_BACKEND",
+  "description": "백엔드 API 구현 완료 후 전체 검증. 파일 존재 여부, API 응답 형식, 인증 흐름, 요금 계산 로직, 예약 충돌 방지 등을 확인한다.",
+  "checks": [
+    {
+      "id": "CHECK_001",
+      "title": "인증 유틸리티 파일 존재 확인",
+      "type": "file_exists",
+      "target": "src/lib/auth.ts",
+      "expected": "파일이 존재하고 sign, verify, requireAdmin 함수가 export되어 있다"
+    },
+    {
+      "id": "CHECK_002",
+      "title": "미들웨어 파일 존재 확인",
+      "type": "file_exists",
+      "target": "src/middleware.ts",
+      "expected": "파일이 존재하고 config.matcher에 /admin/** 경로가 포함되어 있다"
+    },
+    {
+      "id": "CHECK_003",
+      "title": "인증 API 파일 존재 확인",
+      "type": "file_exists",
+      "target": "src/app/api/auth/login/route.ts, src/app/api/auth/logout/route.ts, src/app/api/auth/me/route.ts, src/app/api/auth/password/route.ts",
+      "expected": "4개 인증 API 라우트 파일이 모두 존재한다"
+    },
+    {
+      "id": "CHECK_004",
+      "title": "객실 API 파일 존재 확인",
+      "type": "file_exists",
+      "target": "src/app/api/rooms/route.ts, src/app/api/rooms/[id]/route.ts",
+      "expected": "객실 목록/상세 API 라우트 파일이 존재한다"
+    },
+    {
+      "id": "CHECK_005",
+      "title": "요금 계산 로직 파일 존재 확인",
+      "type": "file_exists",
+      "target": "src/lib/pricing.ts",
+      "expected": "파일이 존재하고 calculatePrice 함수가 export되어 있다"
+    },
+    {
+      "id": "CHECK_006",
+      "title": "요금 API 파일 존재 확인",
+      "type": "file_exists",
+      "target": "src/app/api/pricing/calculate/route.ts, src/app/api/pricing/seasons/route.ts, src/app/api/pricing/seasons/[id]/route.ts, src/app/api/pricing/rooms/[roomId]/route.ts, src/app/api/pricing/special/route.ts, src/app/api/pricing/special/[id]/route.ts",
+      "expected": "6개 요금 API 라우트 파일이 모두 존재한다"
+    },
+    {
+      "id": "CHECK_007",
+      "title": "예약 API 파일 존재 확인",
+      "type": "file_exists",
+      "target": "src/app/api/reservations/route.ts, src/app/api/reservations/[id]/route.ts, src/app/api/reservations/[id]/status/route.ts, src/app/api/reservations/check/route.ts",
+      "expected": "4개 예약 API 라우트 파일이 모두 존재한다"
+    },
+    {
+      "id": "CHECK_008",
+      "title": "예약 가능 날짜 API 파일 존재 확인",
+      "type": "file_exists",
+      "target": "src/app/api/availability/route.ts",
+      "expected": "예약 가능 날짜 API 라우트 파일이 존재한다"
+    },
+    {
+      "id": "CHECK_009",
+      "title": "공지사항 API 파일 존재 확인",
+      "type": "file_exists",
+      "target": "src/app/api/notices/route.ts, src/app/api/notices/[id]/route.ts",
+      "expected": "공지사항 목록/상세 API 라우트 파일이 존재한다"
+    },
+    {
+      "id": "CHECK_010",
+      "title": "설정 API 파일 존재 확인",
+      "type": "file_exists",
+      "target": "src/app/api/settings/route.ts, src/app/api/settings/[key]/route.ts",
+      "expected": "설정 API 라우트 파일이 존재한다"
+    },
+    {
+      "id": "CHECK_011",
+      "title": "대시보드 API 파일 존재 확인",
+      "type": "file_exists",
+      "target": "src/app/api/dashboard/summary/route.ts, src/app/api/dashboard/monthly-revenue/route.ts, src/app/api/dashboard/calendar/route.ts",
+      "expected": "3개 대시보드 API 라우트 파일이 모두 존재한다"
+    },
+    {
+      "id": "CHECK_012",
+      "title": "이미지 업로드 API 파일 존재 확인",
+      "type": "file_exists",
+      "target": "src/app/api/upload/route.ts, src/app/api/upload/[filename]/route.ts",
+      "expected": "이미지 업로드/삭제 API 라우트 파일이 존재한다"
+    },
+    {
+      "id": "CHECK_013",
+      "title": "API 응답 유틸리티 파일 존재 확인",
+      "type": "file_exists",
+      "target": "src/lib/api-utils.ts",
+      "expected": "파일이 존재하고 successResponse, badRequest, unauthorized, notFound, conflict, serverError 함수가 export되어 있다"
+    },
+    {
+      "id": "CHECK_014",
+      "title": "TypeScript 컴파일 확인",
+      "type": "command",
+      "target": "전체 프로젝트",
+      "expected": "TypeScript 컴파일 에러가 없다",
+      "command": "npx tsc --noEmit"
+    },
+    {
+      "id": "CHECK_015",
+      "title": "요금 계산 로직 - 시즌 판별 코드 리뷰",
+      "type": "code_review",
+      "target": "src/lib/pricing.ts",
+      "expected": "체크인~체크아웃 각 날짜에 대해 seasons 테이블에서 해당 날짜가 속하는 시즌을 정확히 조회한다"
+    },
+    {
+      "id": "CHECK_016",
+      "title": "요금 계산 로직 - 주중/주말 판별 코드 리뷰",
+      "type": "code_review",
+      "target": "src/lib/pricing.ts",
+      "expected": "금요일(5)과 토요일(6)을 주말로, 나머지를 주중으로 분류한다 (JavaScript Date.getDay() 기준 금=5, 토=6)"
+    },
+    {
+      "id": "CHECK_017",
+      "title": "요금 계산 로직 - 특가 우선 적용 코드 리뷰",
+      "type": "code_review",
+      "target": "src/lib/pricing.ts",
+      "expected": "special_prices 테이블에 해당 날짜+객실의 오버라이드가 있으면 room_prices보다 우선 적용한다"
+    },
+    {
+      "id": "CHECK_018",
+      "title": "요금 계산 로직 - 추가인원 요금 코드 리뷰",
+      "type": "code_review",
+      "target": "src/lib/pricing.ts",
+      "expected": "투숙 인원이 기준인원을 초과하면 (초과인원 수 × 추가요금)을 각 날짜 요금에 가산한다"
+    },
+    {
+      "id": "CHECK_019",
+      "title": "예약번호 생성 형식 코드 리뷰",
+      "type": "code_review",
+      "target": "src/app/api/reservations/route.ts",
+      "expected": "예약번호가 R + YYYYMMDD + 4자리 순번 형식으로 생성된다 (예: R202603120001)"
+    },
+    {
+      "id": "CHECK_020",
+      "title": "예약 날짜 충돌 검증 코드 리뷰",
+      "type": "code_review",
+      "target": "src/app/api/reservations/route.ts",
+      "expected": "동일 객실에 대해 요청된 체크인~체크아웃 기간이 기존 유효 예약과 겹치는지 확인하고, 겹치면 409 Conflict를 반환한다"
+    },
+    {
+      "id": "CHECK_021",
+      "title": "예약 상태 전이 규칙 코드 리뷰",
+      "type": "code_review",
+      "target": "src/app/api/reservations/[id]/status/route.ts",
+      "expected": "정의된 상태 전이(pending→awaiting_payment→payment_confirmed→confirmed→checked_in→checked_out, 또는 cancelled/no_show)만 허용하고, 잘못된 전이는 400을 반환한다"
+    },
+    {
+      "id": "CHECK_022",
+      "title": "관리자 인증 보호 코드 리뷰",
+      "type": "code_review",
+      "target": "src/middleware.ts",
+      "expected": "미들웨어에서 /admin/** 경로 접근 시 JWT 쿠키를 검증하고, 유효하지 않으면 로그인 페이지로 리다이렉트한다"
+    },
+    {
+      "id": "CHECK_023",
+      "title": "API 응답 형식 통일 코드 리뷰",
+      "type": "code_review",
+      "target": "src/lib/api-utils.ts",
+      "expected": "성공 응답은 { success: true, data: ... }, 실패 응답은 { success: false, error: { code, message } } 형식으로 통일되어 있다"
+    },
+    {
+      "id": "CHECK_024",
+      "title": "이미지 업로드 유효성 검증 코드 리뷰",
+      "type": "code_review",
+      "target": "src/app/api/upload/route.ts",
+      "expected": "이미지 형식(jpg, jpeg, png, webp)과 크기(5MB) 제한이 구현되어 있다"
+    },
+    {
+      "id": "CHECK_025",
+      "title": "공지사항 목록 정렬 코드 리뷰",
+      "type": "code_review",
+      "target": "src/app/api/notices/route.ts",
+      "expected": "고정글(is_pinned=true)이 최상단에 위치하고, 그 외는 최신순 정렬이며, 페이징(page, limit) 파라미터를 지원한다"
+    },
+    {
+      "id": "CHECK_026",
+      "title": "예약 목록 필터/검색/페이징 코드 리뷰",
+      "type": "code_review",
+      "target": "src/app/api/reservations/route.ts",
+      "expected": "예약 목록 조회 시 상태(status), 날짜 범위, 검색어(예약번호/이름/연락처) 필터와 페이징을 지원한다"
+    },
+    {
+      "id": "CHECK_027",
+      "title": "대시보드 요약 쿼리 코드 리뷰",
+      "type": "code_review",
+      "target": "src/app/api/dashboard/summary/route.ts",
+      "expected": "오늘 날짜 기준으로 체크인 예정, 체크아웃 예정, 투숙중, 입금대기 건수를 정확히 집계한다"
+    },
+    {
+      "id": "CHECK_028",
+      "title": "예약 조회 API 보안 코드 리뷰",
+      "type": "code_review",
+      "target": "src/app/api/reservations/check/route.ts",
+      "expected": "예약번호와 연락처가 모두 일치해야만 예약 정보를 반환하며, 민감 정보(관리자 메모 등)는 제외한다"
+    }
+  ]
+}

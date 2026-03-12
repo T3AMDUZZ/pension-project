@@ -1,0 +1,288 @@
+{
+  "verification_name": "VERIFICATION_FRONTEND_ADMIN",
+  "description": "펜션 예약 웹사이트 관리자 프론트엔드 구현 검증 명세. 파일 존재 여부, 컴파일 검증, 코드 리뷰 기준을 정의한다.",
+  "checks": [
+    {
+      "id": "CHECK_001",
+      "title": "공통 타입 파일 존재 확인",
+      "type": "file_exists",
+      "target": [
+        "src/types/admin.ts",
+        "src/types/reservation.ts",
+        "src/types/room.ts",
+        "src/types/pricing.ts",
+        "src/types/notice.ts",
+        "src/types/settings.ts"
+      ],
+      "expected": "모든 타입 정의 파일이 존재"
+    },
+    {
+      "id": "CHECK_002",
+      "title": "인증 관련 파일 존재 확인",
+      "type": "file_exists",
+      "target": [
+        "src/lib/auth.ts",
+        "src/lib/api.ts",
+        "src/contexts/AuthContext.tsx",
+        "src/hooks/useAuth.ts"
+      ],
+      "expected": "인증 유틸리티 및 컨텍스트 파일이 존재"
+    },
+    {
+      "id": "CHECK_003",
+      "title": "공통 레이아웃 컴포넌트 파일 존재 확인",
+      "type": "file_exists",
+      "target": [
+        "src/components/admin/AdminLayout.tsx",
+        "src/components/admin/AdminSidebar.tsx",
+        "src/components/admin/TopBar.tsx",
+        "src/app/admin/layout.tsx"
+      ],
+      "expected": "레이아웃 관련 컴포넌트 파일이 존재"
+    },
+    {
+      "id": "CHECK_004",
+      "title": "공통 UI 컴포넌트 파일 존재 확인",
+      "type": "file_exists",
+      "target": [
+        "src/components/admin/DataTable.tsx",
+        "src/components/admin/StatusBadge.tsx",
+        "src/components/admin/ConfirmDialog.tsx",
+        "src/components/admin/ImageUploader.tsx",
+        "src/components/admin/AdminCalendar.tsx"
+      ],
+      "expected": "공통 UI 컴포넌트 파일이 존재"
+    },
+    {
+      "id": "CHECK_005",
+      "title": "로그인 페이지 파일 존재 확인",
+      "type": "file_exists",
+      "target": "src/app/admin/login/page.tsx",
+      "expected": "로그인 페이지 파일이 존재"
+    },
+    {
+      "id": "CHECK_006",
+      "title": "대시보드 페이지 및 하위 컴포넌트 존재 확인",
+      "type": "file_exists",
+      "target": [
+        "src/app/admin/page.tsx",
+        "src/components/admin/dashboard/StatCard.tsx",
+        "src/components/admin/dashboard/RoomStatusGrid.tsx",
+        "src/components/admin/dashboard/RecentReservations.tsx",
+        "src/components/admin/dashboard/RevenueSummary.tsx"
+      ],
+      "expected": "대시보드 관련 모든 파일이 존재"
+    },
+    {
+      "id": "CHECK_007",
+      "title": "예약 관리 페이지 파일 존재 확인",
+      "type": "file_exists",
+      "target": [
+        "src/app/admin/reservations/page.tsx",
+        "src/app/admin/reservations/[id]/page.tsx",
+        "src/app/admin/reservations/calendar/page.tsx",
+        "src/components/admin/reservations/ReservationFilters.tsx",
+        "src/components/admin/reservations/ReservationDetail.tsx",
+        "src/components/admin/reservations/StatusWorkflow.tsx",
+        "src/components/admin/reservations/AdminMemo.tsx",
+        "src/components/admin/reservations/ManualReservationModal.tsx"
+      ],
+      "expected": "예약 관리 관련 모든 파일이 존재"
+    },
+    {
+      "id": "CHECK_008",
+      "title": "객실 관리 페이지 파일 존재 확인",
+      "type": "file_exists",
+      "target": [
+        "src/app/admin/rooms/page.tsx",
+        "src/app/admin/rooms/new/page.tsx",
+        "src/app/admin/rooms/[id]/page.tsx",
+        "src/components/admin/rooms/RoomCard.tsx",
+        "src/components/admin/rooms/SortableRoomList.tsx",
+        "src/components/admin/rooms/RoomForm.tsx"
+      ],
+      "expected": "객실 관리 관련 모든 파일이 존재"
+    },
+    {
+      "id": "CHECK_009",
+      "title": "요금 관리 페이지 파일 존재 확인",
+      "type": "file_exists",
+      "target": [
+        "src/app/admin/pricing/page.tsx",
+        "src/components/admin/pricing/SeasonManager.tsx",
+        "src/components/admin/pricing/PriceMatrix.tsx",
+        "src/components/admin/pricing/ExtraPersonPrice.tsx",
+        "src/components/admin/pricing/SpecialPriceCalendar.tsx"
+      ],
+      "expected": "요금 관리 관련 모든 파일이 존재"
+    },
+    {
+      "id": "CHECK_010",
+      "title": "공지사항 관리 페이지 파일 존재 확인",
+      "type": "file_exists",
+      "target": [
+        "src/app/admin/notices/page.tsx",
+        "src/app/admin/notices/new/page.tsx",
+        "src/app/admin/notices/[id]/page.tsx",
+        "src/components/admin/notices/NoticeForm.tsx"
+      ],
+      "expected": "공지사항 관리 관련 모든 파일이 존재"
+    },
+    {
+      "id": "CHECK_011",
+      "title": "설정 페이지 파일 존재 확인",
+      "type": "file_exists",
+      "target": [
+        "src/app/admin/settings/page.tsx",
+        "src/components/admin/settings/PensionInfoForm.tsx",
+        "src/components/admin/settings/BankAccountForm.tsx",
+        "src/components/admin/settings/ReservationPolicyForm.tsx",
+        "src/components/admin/settings/PasswordChangeForm.tsx"
+      ],
+      "expected": "설정 관련 모든 파일이 존재"
+    },
+    {
+      "id": "CHECK_012",
+      "title": "API 서비스 레이어 파일 존재 확인",
+      "type": "file_exists",
+      "target": [
+        "src/services/admin/reservationService.ts",
+        "src/services/admin/roomService.ts",
+        "src/services/admin/pricingService.ts",
+        "src/services/admin/noticeService.ts",
+        "src/services/admin/settingsService.ts",
+        "src/services/admin/dashboardService.ts",
+        "src/services/admin/authService.ts"
+      ],
+      "expected": "모든 API 서비스 파일이 존재"
+    },
+    {
+      "id": "CHECK_013",
+      "title": "TypeScript 컴파일 검증",
+      "type": "command",
+      "target": "프로젝트 전체",
+      "expected": "컴파일 에러 없이 빌드 성공",
+      "command": "cd /root/si/pension-project && npx tsc --noEmit"
+    },
+    {
+      "id": "CHECK_014",
+      "title": "Next.js 빌드 검증",
+      "type": "command",
+      "target": "프로젝트 전체",
+      "expected": "빌드 에러 없이 성공",
+      "command": "cd /root/si/pension-project && npm run build"
+    },
+    {
+      "id": "CHECK_015",
+      "title": "예약 상태 enum 정의 검증",
+      "type": "code_review",
+      "target": "src/types/reservation.ts",
+      "expected": "ReservationStatus enum에 PENDING, DEPOSIT_WAIT, CONFIRMED, CHECKED_IN, CHECKED_OUT, CANCELLED 값이 모두 정의되어 있어야 한다."
+    },
+    {
+      "id": "CHECK_016",
+      "title": "객실 상태 enum 정의 검증",
+      "type": "code_review",
+      "target": "src/types/room.ts",
+      "expected": "RoomStatus enum에 EMPTY, OCCUPIED, CLEANING, HIDDEN 값이 모두 정의되어 있어야 한다."
+    },
+    {
+      "id": "CHECK_017",
+      "title": "JWT 인증 흐름 검증",
+      "type": "code_review",
+      "target": "src/lib/api.ts",
+      "expected": "axios 인스턴스에 request interceptor로 Authorization: Bearer 헤더 자동 첨부, response interceptor로 401 시 토큰 삭제 및 /admin/login 리다이렉트 로직이 있어야 한다."
+    },
+    {
+      "id": "CHECK_018",
+      "title": "AdminLayout 인증 가드 검증",
+      "type": "code_review",
+      "target": "src/app/admin/layout.tsx",
+      "expected": "layout.tsx에서 인증 상태 확인 후 미인증 시 /admin/login으로 리다이렉트하는 로직이 있어야 한다."
+    },
+    {
+      "id": "CHECK_019",
+      "title": "사이드바 메뉴 항목 검증",
+      "type": "code_review",
+      "target": "src/components/admin/AdminSidebar.tsx",
+      "expected": "사이드바에 대시보드(/admin), 예약관리(/admin/reservations), 객실관리(/admin/rooms), 요금관리(/admin/pricing), 공지관리(/admin/notices), 설정(/admin/settings) 메뉴가 모두 있어야 한다."
+    },
+    {
+      "id": "CHECK_020",
+      "title": "DataTable 제네릭 타입 지원 검증",
+      "type": "code_review",
+      "target": "src/components/admin/DataTable.tsx",
+      "expected": "DataTable 컴포넌트가 제네릭 타입 <T>을 사용하여 다양한 데이터 구조를 지원해야 한다. columns 정의에 accessor, sortable, render 커스텀 함수를 지원해야 한다."
+    },
+    {
+      "id": "CHECK_021",
+      "title": "대시보드 현황 카드 4종 검증",
+      "type": "code_review",
+      "target": "src/app/admin/page.tsx",
+      "expected": "대시보드 페이지에 체크인/체크아웃/투숙중/입금대기 4개 현황 카드가 렌더링되어야 한다."
+    },
+    {
+      "id": "CHECK_022",
+      "title": "예약 상태 워크플로우 검증",
+      "type": "code_review",
+      "target": "src/components/admin/reservations/StatusWorkflow.tsx",
+      "expected": "예약 상태 변경 워크플로우(PENDING → DEPOSIT_WAIT → CONFIRMED → CHECKED_IN → CHECKED_OUT)가 정의되어 있고, 현재 상태에서 가능한 다음 상태만 버튼으로 표시해야 한다."
+    },
+    {
+      "id": "CHECK_023",
+      "title": "ImageUploader 드래그 순서 변경 검증",
+      "type": "code_review",
+      "target": "src/components/admin/ImageUploader.tsx",
+      "expected": "이미지 드래그앤드롭 순서 변경 기능과 대표 이미지 지정 기능이 구현되어 있어야 한다."
+    },
+    {
+      "id": "CHECK_024",
+      "title": "요금 매트릭스 구조 검증",
+      "type": "code_review",
+      "target": "src/components/admin/pricing/PriceMatrix.tsx",
+      "expected": "시즌 x 요일 매트릭스 형태의 테이블이 구현되어 있고, 각 셀에서 가격을 직접 입력할 수 있어야 한다."
+    },
+    {
+      "id": "CHECK_025",
+      "title": "설정 페이지 탭/섹션 구성 검증",
+      "type": "code_review",
+      "target": "src/app/admin/settings/page.tsx",
+      "expected": "펜션 정보, 입금 계좌, 예약 정책, 관리자 계정(비밀번호 변경) 4개 섹션 또는 탭이 구성되어 있어야 한다."
+    },
+    {
+      "id": "CHECK_026",
+      "title": "API 서비스 CRUD 함수 검증",
+      "type": "code_review",
+      "target": "src/services/admin/reservationService.ts",
+      "expected": "예약 서비스에 목록조회(필터/페이징), 상세조회, 상태변경, 수정, 수동등록, 캘린더 데이터 조회 함수가 모두 정의되어 있어야 한다."
+    },
+    {
+      "id": "CHECK_027",
+      "title": "로그인 페이지 독립 레이아웃 검증",
+      "type": "code_review",
+      "target": "src/app/admin/login/page.tsx",
+      "expected": "로그인 페이지는 AdminLayout(사이드바/상단바) 없이 독립적인 센터 정렬 레이아웃으로 구현되어야 한다."
+    },
+    {
+      "id": "CHECK_028",
+      "title": "ConfirmDialog 모달 기능 검증",
+      "type": "code_review",
+      "target": "src/components/admin/ConfirmDialog.tsx",
+      "expected": "제목, 메시지, 확인/취소 버튼이 있고, 오버레이 배경 클릭 또는 ESC 키로 닫기가 가능해야 한다."
+    },
+    {
+      "id": "CHECK_029",
+      "title": "예약 달력 수동 예약 모달 검증",
+      "type": "code_review",
+      "target": "src/components/admin/reservations/ManualReservationModal.tsx",
+      "expected": "수동 예약 등록 모달에 객실 선택, 체크인/아웃 날짜, 예약자 정보(이름, 연락처) 입력 필드와 저장/취소 버튼이 있어야 한다."
+    },
+    {
+      "id": "CHECK_030",
+      "title": "Tailwind CSS 적용 검증",
+      "type": "code_review",
+      "target": "src/components/admin/AdminLayout.tsx",
+      "expected": "Tailwind CSS 유틸리티 클래스를 사용하여 스타일링되어 있어야 한다. inline style이나 별도 CSS 파일 대신 Tailwind 클래스 사용."
+    }
+  ]
+}

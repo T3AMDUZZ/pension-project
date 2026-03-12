@@ -1,0 +1,157 @@
+{
+  "plan_name": "PLAN_SETUP",
+  "description": "Next.js (App Router) + Tailwind CSS + Supabase 기반 펜션 예약 관리 웹사이트의 프로젝트 초기 셋업. 프로젝트 생성, 스타일링 설정, Supabase 클라이언트 구성, 폴더 구조 정의, 공통 레이아웃 및 컴포넌트 기본 구조를 포함한다.",
+  "tasks": [
+    {
+      "id": "TASK_001",
+      "title": "Next.js 프로젝트 생성",
+      "description": "create-next-app으로 Next.js 프로젝트를 생성한다. App Router, TypeScript, ESLint를 활성화하고 src 디렉토리 구조를 사용한다.",
+      "files_to_create": [
+        "package.json",
+        "tsconfig.json",
+        "next.config.ts",
+        "src/app/layout.tsx",
+        "src/app/page.tsx"
+      ],
+      "files_to_modify": [],
+      "dependencies": [],
+      "acceptance_criteria": [
+        "npm run dev로 로컬 개발 서버가 정상 기동된다",
+        "TypeScript 컴파일 에러가 없다",
+        "App Router 기반 라우팅이 동작한다"
+      ]
+    },
+    {
+      "id": "TASK_002",
+      "title": "Tailwind CSS 설정",
+      "description": "Tailwind CSS를 설치하고 글로벌 스타일을 구성한다. 모바일 우선 반응형 디자인을 위한 기본 설정과 펜션 사이트에 맞는 커스텀 색상 팔레트를 정의한다.",
+      "files_to_create": [],
+      "files_to_modify": [
+        "tailwind.config.ts",
+        "src/app/globals.css"
+      ],
+      "dependencies": ["TASK_001"],
+      "acceptance_criteria": [
+        "Tailwind 유틸리티 클래스가 정상 적용된다",
+        "커스텀 색상 팔레트가 tailwind.config.ts에 정의되어 있다",
+        "글로벌 CSS에 Tailwind 디렉티브(@tailwind base, components, utilities)가 포함되어 있다"
+      ]
+    },
+    {
+      "id": "TASK_003",
+      "title": "Supabase 클라이언트 설정",
+      "description": "Supabase JavaScript 클라이언트 라이브러리(@supabase/supabase-js)를 설치하고, 환경변수 기반으로 클라이언트(브라우저용)와 서버용 클라이언트를 각각 생성하는 유틸리티를 작성한다.",
+      "files_to_create": [
+        "src/lib/supabase.ts",
+        ".env.local.example"
+      ],
+      "files_to_modify": [
+        ".gitignore"
+      ],
+      "dependencies": ["TASK_001"],
+      "acceptance_criteria": [
+        "@supabase/supabase-js 패키지가 설치되어 있다",
+        "NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY 환경변수를 사용한다",
+        ".env.local.example 파일에 필요한 환경변수 템플릿이 있다",
+        ".gitignore에 .env.local이 포함되어 있다",
+        "브라우저용 클라이언트와 서버용 클라이언트가 분리되어 있다"
+      ]
+    },
+    {
+      "id": "TASK_004",
+      "title": "프로젝트 폴더 구조 생성",
+      "description": "사용자 페이지, 관리자 페이지, API 라우트, 컴포넌트, 라이브러리 등 전체 폴더 구조를 생성한다. 각 폴더에 필요한 빈 파일 또는 placeholder를 배치한다.",
+      "files_to_create": [
+        "src/app/(public)/page.tsx",
+        "src/app/(public)/rooms/page.tsx",
+        "src/app/(public)/reservation/page.tsx",
+        "src/app/(public)/check/page.tsx",
+        "src/app/(public)/about/page.tsx",
+        "src/app/(public)/notice/page.tsx",
+        "src/app/(public)/layout.tsx",
+        "src/app/admin/page.tsx",
+        "src/app/admin/reservations/page.tsx",
+        "src/app/admin/rooms/page.tsx",
+        "src/app/admin/pricing/page.tsx",
+        "src/app/admin/notices/page.tsx",
+        "src/app/admin/settings/page.tsx",
+        "src/app/admin/layout.tsx",
+        "src/app/api/.gitkeep",
+        "src/components/ui/.gitkeep",
+        "src/components/public/.gitkeep",
+        "src/components/admin/.gitkeep",
+        "src/lib/utils.ts",
+        "src/lib/types.ts",
+        "src/styles/.gitkeep"
+      ],
+      "files_to_modify": [],
+      "dependencies": ["TASK_001", "TASK_002"],
+      "acceptance_criteria": [
+        "src/app/(public)/ 하위에 메인, 객실, 예약, 예약조회, 펜션소개, 공지사항 페이지 파일이 존재한다",
+        "src/app/admin/ 하위에 대시보드, 예약관리, 객실관리, 요금관리, 공지관리, 설정 페이지 파일이 존재한다",
+        "src/components/ui, public, admin 디렉토리가 존재한다",
+        "src/lib/에 utils.ts, types.ts 파일이 존재한다"
+      ]
+    },
+    {
+      "id": "TASK_005",
+      "title": "타입 정의",
+      "description": "데이터베이스 테이블과 매핑되는 TypeScript 타입/인터페이스를 정의한다. Room, Season, RoomPrice, SpecialPrice, Reservation, Notice, Setting, AdminUser 타입을 포함한다.",
+      "files_to_create": [],
+      "files_to_modify": [
+        "src/lib/types.ts"
+      ],
+      "dependencies": ["TASK_004"],
+      "acceptance_criteria": [
+        "Room, Season, RoomPrice, SpecialPrice, Reservation, Notice, Setting, AdminUser 타입이 정의되어 있다",
+        "예약 상태(ReservationStatus)와 결제 방법(PaymentMethod) enum 또는 union 타입이 정의되어 있다",
+        "TypeScript 컴파일 에러가 없다"
+      ]
+    },
+    {
+      "id": "TASK_006",
+      "title": "공통 유틸리티 함수",
+      "description": "날짜 포맷팅, 가격 포맷팅(원화), 예약번호 생성, cn(className 병합) 등 프로젝트 전반에서 사용할 유틸리티 함수를 작성한다.",
+      "files_to_create": [],
+      "files_to_modify": [
+        "src/lib/utils.ts"
+      ],
+      "dependencies": ["TASK_004"],
+      "acceptance_criteria": [
+        "날짜 포맷팅 함수가 있다 (YYYY-MM-DD, YYYY년 MM월 DD일 등)",
+        "가격 포맷팅 함수가 있다 (1000 -> '1,000원')",
+        "예약번호 생성 함수가 있다",
+        "Tailwind 클래스 병합 유틸리티(cn)가 있다"
+      ]
+    },
+    {
+      "id": "TASK_007",
+      "title": "공통 레이아웃 및 UI 컴포넌트",
+      "description": "사용자 페이지용 레이아웃(Header, Footer, Navigation)과 관리자 페이지용 레이아웃(Sidebar, AdminHeader)을 구성한다. Button, Input, Modal 등 기본 UI 컴포넌트의 뼈대를 만든다.",
+      "files_to_create": [
+        "src/components/ui/Button.tsx",
+        "src/components/ui/Input.tsx",
+        "src/components/ui/Modal.tsx",
+        "src/components/ui/Card.tsx",
+        "src/components/public/Header.tsx",
+        "src/components/public/Footer.tsx",
+        "src/components/public/Navigation.tsx",
+        "src/components/admin/AdminHeader.tsx",
+        "src/components/admin/Sidebar.tsx"
+      ],
+      "files_to_modify": [
+        "src/app/(public)/layout.tsx",
+        "src/app/admin/layout.tsx",
+        "src/app/layout.tsx"
+      ],
+      "dependencies": ["TASK_004", "TASK_005", "TASK_006"],
+      "acceptance_criteria": [
+        "사용자 페이지에 Header, Footer, Navigation이 표시된다",
+        "관리자 페이지에 Sidebar, AdminHeader가 표시된다",
+        "Button, Input, Modal, Card 컴포넌트가 존재하고 기본 props를 받는다",
+        "모바일에서 Navigation이 햄버거 메뉴로 동작한다",
+        "반응형 레이아웃이 적용된다"
+      ]
+    }
+  ]
+}

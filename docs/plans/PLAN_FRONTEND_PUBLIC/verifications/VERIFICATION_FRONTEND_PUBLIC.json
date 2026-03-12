@@ -1,0 +1,232 @@
+{
+  "verification_name": "VERIFICATION_FRONTEND_PUBLIC",
+  "description": "사용자(Public) 프론트엔드 구현 완료 검증. 모든 페이지 파일 존재 여부, 공통 컴포넌트 구현, 반응형 레이아웃, 페이지 간 네비게이션, 예약 프로세스 흐름을 검증한다.",
+  "checks": [
+    {
+      "id": "CHECK_001",
+      "title": "공통 레이아웃 파일 존재 확인",
+      "type": "file_exists",
+      "target": "src/app/(public)/layout.tsx",
+      "expected": "파일이 존재하며 Header, Footer 컴포넌트를 import하여 children을 감싸는 구조이다"
+    },
+    {
+      "id": "CHECK_002",
+      "title": "Header 컴포넌트 파일 존재 확인",
+      "type": "file_exists",
+      "target": "src/components/public/Header.tsx",
+      "expected": "파일이 존재하며 모바일 햄버거 메뉴와 데스크탑 네비게이션을 포함한다"
+    },
+    {
+      "id": "CHECK_003",
+      "title": "Footer 컴포넌트 파일 존재 확인",
+      "type": "file_exists",
+      "target": "src/components/public/Footer.tsx",
+      "expected": "파일이 존재하며 주소, 연락처, 계좌정보, 사업자정보 영역을 포함한다"
+    },
+    {
+      "id": "CHECK_004",
+      "title": "Navigation 컴포넌트 파일 존재 확인",
+      "type": "file_exists",
+      "target": "src/components/public/Navigation.tsx",
+      "expected": "파일이 존재하며 메뉴 항목(객실안내, 예약하기, 예약조회, 펜션소개, 공지사항, 이용안내)을 포함한다"
+    },
+    {
+      "id": "CHECK_005",
+      "title": "ImageSlider 컴포넌트 파일 존재 확인",
+      "type": "file_exists",
+      "target": "src/components/public/ImageSlider.tsx",
+      "expected": "파일이 존재하며 이미지 배열을 props로 받아 슬라이드 기능을 제공한다"
+    },
+    {
+      "id": "CHECK_006",
+      "title": "ImageGallery 컴포넌트 파일 존재 확인",
+      "type": "file_exists",
+      "target": "src/components/public/ImageGallery.tsx",
+      "expected": "파일이 존재하며 객실 상세용 이미지 갤러리를 제공한다"
+    },
+    {
+      "id": "CHECK_007",
+      "title": "RoomCard 컴포넌트 파일 존재 확인",
+      "type": "file_exists",
+      "target": "src/components/public/RoomCard.tsx",
+      "expected": "파일이 존재하며 이미지, 객실명, 기준인원, 가격, 예약가능 뱃지를 표시한다"
+    },
+    {
+      "id": "CHECK_008",
+      "title": "Calendar 컴포넌트 파일 존재 확인",
+      "type": "file_exists",
+      "target": "src/components/public/Calendar.tsx",
+      "expected": "파일이 존재하며 월간 달력 뷰, 가능/마감 색상 구분, 날짜 범위 선택 기능을 포함한다"
+    },
+    {
+      "id": "CHECK_009",
+      "title": "StepIndicator 컴포넌트 파일 존재 확인",
+      "type": "file_exists",
+      "target": "src/components/public/StepIndicator.tsx",
+      "expected": "파일이 존재하며 3단계 진행 상태를 시각적으로 표시한다"
+    },
+    {
+      "id": "CHECK_010",
+      "title": "메인 페이지 파일 존재 확인",
+      "type": "file_exists",
+      "target": "src/app/(public)/page.tsx",
+      "expected": "파일이 존재하며 히어로 배너, 빠른 예약 폼, 객실 미리보기, 펜션 소개, 공지사항 섹션을 포함한다"
+    },
+    {
+      "id": "CHECK_011",
+      "title": "객실 목록 페이지 파일 존재 확인",
+      "type": "file_exists",
+      "target": "src/app/(public)/rooms/page.tsx",
+      "expected": "파일이 존재하며 RoomCard 카드 그리드, 필터, 정렬 기능을 포함한다"
+    },
+    {
+      "id": "CHECK_012",
+      "title": "객실 상세 페이지 파일 존재 확인",
+      "type": "file_exists",
+      "target": "src/app/(public)/rooms/[id]/page.tsx",
+      "expected": "파일이 존재하며 이미지 갤러리, 기본정보, 가격표, 편의시설, 예약 달력, CTA 버튼을 포함한다"
+    },
+    {
+      "id": "CHECK_013",
+      "title": "예약 날짜선택 페이지 파일 존재 확인",
+      "type": "file_exists",
+      "target": "src/app/(public)/reservation/page.tsx",
+      "expected": "파일이 존재하며 StepIndicator(Step 1), Calendar, 객실 선택, 인원 입력, 요금 미리보기를 포함한다"
+    },
+    {
+      "id": "CHECK_014",
+      "title": "예약 정보입력 페이지 파일 존재 확인",
+      "type": "file_exists",
+      "target": "src/app/(public)/reservation/info/page.tsx",
+      "expected": "파일이 존재하며 StepIndicator(Step 2), 예약자 정보 폼, 결제 방식 선택, 예약 요약을 포함한다"
+    },
+    {
+      "id": "CHECK_015",
+      "title": "예약 완료 페이지 파일 존재 확인",
+      "type": "file_exists",
+      "target": "src/app/(public)/reservation/complete/page.tsx",
+      "expected": "파일이 존재하며 StepIndicator(Step 3), 예약번호, 예약 요약, 입금 안내를 포함한다"
+    },
+    {
+      "id": "CHECK_016",
+      "title": "예약 조회 페이지 파일 존재 확인",
+      "type": "file_exists",
+      "target": "src/app/(public)/check/page.tsx",
+      "expected": "파일이 존재하며 예약번호/연락처 입력 폼, 상태 뱃지, 취소 요청 버튼을 포함한다"
+    },
+    {
+      "id": "CHECK_017",
+      "title": "펜션 소개 인사말 페이지 파일 존재 확인",
+      "type": "file_exists",
+      "target": "src/app/(public)/about/page.tsx",
+      "expected": "파일이 존재하며 소개 텍스트, 대표 이미지, 서브네비게이션을 포함한다"
+    },
+    {
+      "id": "CHECK_018",
+      "title": "오시는 길 페이지 파일 존재 확인",
+      "type": "file_exists",
+      "target": "src/app/(public)/about/location/page.tsx",
+      "expected": "파일이 존재하며 카카오맵(또는 Placeholder), 주소, 교통편 안내를 포함한다"
+    },
+    {
+      "id": "CHECK_019",
+      "title": "주변 관광지 페이지 파일 존재 확인",
+      "type": "file_exists",
+      "target": "src/app/(public)/about/attractions/page.tsx",
+      "expected": "파일이 존재하며 관광지 카드 리스트(이미지+설명)를 포함한다"
+    },
+    {
+      "id": "CHECK_020",
+      "title": "공지사항 목록 페이지 파일 존재 확인",
+      "type": "file_exists",
+      "target": "src/app/(public)/notice/page.tsx",
+      "expected": "파일이 존재하며 공지 리스트, 고정글 표시, 페이지네이션을 포함한다"
+    },
+    {
+      "id": "CHECK_021",
+      "title": "공지사항 상세 페이지 파일 존재 확인",
+      "type": "file_exists",
+      "target": "src/app/(public)/notice/[id]/page.tsx",
+      "expected": "파일이 존재하며 제목, 내용, 작성일, 목록 버튼을 포함한다"
+    },
+    {
+      "id": "CHECK_022",
+      "title": "이용안내 페이지 파일 존재 확인",
+      "type": "file_exists",
+      "target": "src/app/(public)/guide/page.tsx",
+      "expected": "파일이 존재하며 입퇴실 시간, 환불 규정, 바베큐 안내, 이용 수칙 섹션을 포함한다"
+    },
+    {
+      "id": "CHECK_023",
+      "title": "TypeScript 컴파일 검증",
+      "type": "command",
+      "target": "프로젝트 전체",
+      "expected": "TypeScript 컴파일 에러가 없다",
+      "command": "cd /root/si/pension-project && npx tsc --noEmit 2>&1 | head -20"
+    },
+    {
+      "id": "CHECK_024",
+      "title": "Next.js 빌드 검증",
+      "type": "command",
+      "target": "프로젝트 전체",
+      "expected": "빌드가 성공적으로 완료된다",
+      "command": "cd /root/si/pension-project && npm run build 2>&1 | tail -20"
+    },
+    {
+      "id": "CHECK_025",
+      "title": "Header에 반응형 클래스 적용 확인",
+      "type": "code_review",
+      "target": "src/components/public/Header.tsx",
+      "expected": "md: 또는 lg: 등 Tailwind 반응형 접두사가 사용되고, 모바일 햄버거 메뉴(md:hidden 등)와 데스크탑 네비게이션(hidden md:flex 등)이 구분되어 있다"
+    },
+    {
+      "id": "CHECK_026",
+      "title": "메인 페이지 섹션 구성 확인",
+      "type": "code_review",
+      "target": "src/app/(public)/page.tsx",
+      "expected": "ImageSlider, 빠른예약폼, RoomCard, 펜션소개, 공지사항 등 5개 이상 섹션이 구현되어 있다"
+    },
+    {
+      "id": "CHECK_027",
+      "title": "예약 프로세스 페이지 간 라우팅 확인",
+      "type": "code_review",
+      "target": "src/app/(public)/reservation/page.tsx, src/app/(public)/reservation/info/page.tsx, src/app/(public)/reservation/complete/page.tsx",
+      "expected": "Step 1에서 Step 2로, Step 2에서 Step 3으로 이동하는 라우팅(router.push 또는 Link)이 구현되어 있다"
+    },
+    {
+      "id": "CHECK_028",
+      "title": "Calendar 컴포넌트 날짜 선택 로직 확인",
+      "type": "code_review",
+      "target": "src/components/public/Calendar.tsx",
+      "expected": "체크인/체크아웃 날짜 범위 선택, 예약 가능/마감 상태 색상 구분, 월 이동 기능이 구현되어 있다"
+    },
+    {
+      "id": "CHECK_029",
+      "title": "객실 상세 페이지 가격표 구조 확인",
+      "type": "code_review",
+      "target": "src/app/(public)/rooms/[id]/page.tsx",
+      "expected": "비수기/성수기 x 주중/주말 가격표가 테이블 또는 그리드 형태로 구현되어 있다"
+    },
+    {
+      "id": "CHECK_030",
+      "title": "예약 조회 폼 유효성 검사 확인",
+      "type": "code_review",
+      "target": "src/app/(public)/check/page.tsx",
+      "expected": "예약번호와 연락처 입력값에 대한 유효성 검사(빈값 체크 등)가 구현되어 있다"
+    },
+    {
+      "id": "CHECK_031",
+      "title": "공지사항 페이지네이션 확인",
+      "type": "code_review",
+      "target": "src/app/(public)/notice/page.tsx",
+      "expected": "페이지네이션 UI와 페이지 이동 로직이 구현되어 있다"
+    },
+    {
+      "id": "CHECK_032",
+      "title": "이용안내 페이지 섹션 구성 확인",
+      "type": "code_review",
+      "target": "src/app/(public)/guide/page.tsx",
+      "expected": "입퇴실 시간, 환불 규정, 바베큐 안내 등 최소 3개 이상 섹션이 구조화되어 있다"
+    }
+  ]
+}

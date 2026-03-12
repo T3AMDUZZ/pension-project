@@ -1,0 +1,41 @@
+@import "tailwindcss";
+
+/* 펜션 테마 커스텀 색상 */
+@theme inline {
+  --color-pension-primary: #2d6a4f;
+  --color-pension-secondary: #40916c;
+  --color-pension-accent: #95d5b2;
+  --color-pension-light: #d8f3dc;
+  --color-pension-dark: #1b4332;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+/* 스크롤바 스타일 */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a1a1a1;
+}

@@ -1,0 +1,109 @@
+{
+  "plan_name": "PLAN_DATABASE",
+  "description": "펜션 예약 관리 웹사이트의 Supabase(PostgreSQL) 데이터베이스 설계 및 마이그레이션. rooms, seasons, room_prices, special_prices, reservations, notices, settings, admin_users 테이블을 포함한다.",
+  "tasks": [
+    {
+      "id": "TASK_001",
+      "title": "마이그레이션 SQL 작성 - 기본 테이블",
+      "description": "rooms, seasons, admin_users, notices, settings 테이블을 생성하는 마이그레이션 SQL을 작성한다. UUID 확장, updated_at 자동 갱신 트리거, RLS(Row Level Security) 정책을 포함한다.",
+      "files_to_create": [
+        "supabase/migrations/001_create_base_tables.sql"
+      ],
+      "files_to_modify": [],
+      "dependencies": [],
+      "acceptance_criteria": [
+        "uuid-ossp 확장이 활성화된다",
+        "rooms 테이블: id(uuid PK default uuid_generate_v4()), name(varchar NOT NULL), description(text), type(varchar), base_capacity(int NOT NULL), max_capacity(int NOT NULL), size(varchar), amenities(jsonb default '[]'), images(jsonb default '[]'), sort_order(int default 0), is_active(bool default true), created_at(timestamptz default now()), updated_at(timestamptz default now())",
+        "seasons 테이블: id(uuid PK), name(varchar NOT NULL), start_date(date NOT NULL), end_date(date NOT NULL), min_nights(int default 1), created_at(timestamptz default now())",
+        "admin_users 테이블: id(uuid PK), username(varchar UNIQUE NOT NULL), password_hash(varchar NOT NULL), created_at(timestamptz default now())",
+        "notices 테이블: id(uuid PK), title(varchar NOT NULL), content(text NOT NULL), is_pinned(bool default false), created_at(timestamptz default now()), updated_at(timestamptz default now())",
+        "settings 테이블: id(uuid PK), key(varchar UNIQUE NOT NULL), value(jsonb NOT NULL)",
+        "updated_at 자동 갱신 트리거가 rooms, notices 테이블에 적용된다"
+      ]
+    },
+    {
+      "id": "TASK_002",
+      "title": "마이그레이션 SQL 작성 - 요금 테이블",
+      "description": "room_prices, special_prices 테이블을 생성하는 마이그레이션 SQL을 작성한다. rooms 및 seasons 테이블과의 외래키 관계를 설정한다.",
+      "files_to_create": [
+        "supabase/migrations/002_create_pricing_tables.sql"
+      ],
+      "files_to_modify": [],
+      "dependencies": ["TASK_001"],
+      "acceptance_criteria": [
+        "room_prices 테이블: id(uuid PK), room_id(uuid FK rooms ON DELETE CASCADE), season_id(uuid FK seasons ON DELETE CASCADE), weekday_price(int NOT NULL), weekend_price(int NOT NULL), extra_person_price(int default 0), UNIQUE(room_id, season_id)",
+        "special_prices 테이블: id(uuid PK), room_id(uuid FK rooms ON DELETE CASCADE), date(date NOT NULL), price(int NOT NULL), UNIQUE(room_id, date)",
+        "외래키 제약 조건이 올바르게 설정된다",
+        "room_id, season_id에 인덱스가 생성된다"
+      ]
+    },
+    {
+      "id": "TASK_003",
+      "title": "마이그레이션 SQL 작성 - 예약 테이블",
+      "description": "reservations 테이블을 생성하는 마이그레이션 SQL을 작성한다. payment_method, reservation_status 커스텀 enum 타입, 인덱스, 자동 갱신 트리거를 포함한다.",
+      "files_to_create": [
+        "supabase/migrations/003_create_reservations_table.sql"
+      ],
+      "files_to_modify": [],
+      "dependencies": ["TASK_001"],
+      "acceptance_criteria": [
+        "payment_method enum: 'bank_transfer', 'on_site'",
+        "reservation_status enum: 'pending', 'awaiting_payment', 'payment_confirmed', 'confirmed', 'checked_in', 'checked_out', 'cancelled', 'no_show'",
+        "reservations 테이블: id(uuid PK), reservation_number(varchar UNIQUE NOT NULL), room_id(uuid FK rooms), guest_name(varchar NOT NULL), phone(varchar NOT NULL), check_in(date NOT NULL), check_out(date NOT NULL), guests_count(int NOT NULL), payment_method(payment_method NOT NULL), total_price(int NOT NULL), status(reservation_status default 'pending'), vehicle_number(varchar), memo(text), admin_memo(text), created_at(timestamptz default now()), updated_at(timestamptz default now())",
+        "check_in, check_out, status, room_id에 인덱스가 생성된다",
+        "updated_at 자동 갱신 트리거가 적용된다"
+      ]
+    },
+    {
+      "id": "TASK_004",
+      "title": "RLS 정책 설정",
+      "description": "모든 테이블에 Row Level Security를 활성화하고, 사용자(anon) 접근 정책과 관리자(authenticated) 접근 정책을 분리하여 설정한다.",
+      "files_to_create": [
+        "supabase/migrations/004_create_rls_policies.sql"
+      ],
+      "files_to_modify": [],
+      "dependencies": ["TASK_001", "TASK_002", "TASK_003"],
+      "acceptance_criteria": [
+        "모든 테이블에 RLS가 활성화된다",
+        "rooms: anon은 is_active=true인 행만 SELECT 가능, authenticated는 ALL 가능",
+        "seasons, room_prices, special_prices: anon은 SELECT 가능, authenticated는 ALL 가능",
+        "reservations: anon은 INSERT와 reservation_number 기반 SELECT 가능, authenticated는 ALL 가능",
+        "notices: anon은 SELECT 가능, authenticated는 ALL 가능",
+        "settings: anon은 SELECT 가능, authenticated는 ALL 가능",
+        "admin_users: anon 접근 불가, authenticated만 ALL 가능"
+      ]
+    },
+    {
+      "id": "TASK_005",
+      "title": "초기 시드 데이터",
+      "description": "개발 및 테스트를 위한 초기 시드 데이터를 작성한다. 기본 시즌(비수기/성수기/준성수기), 샘플 객실, 기본 설정값, 관리자 계정을 포함한다.",
+      "files_to_create": [
+        "supabase/seed.sql"
+      ],
+      "files_to_modify": [],
+      "dependencies": ["TASK_001", "TASK_002", "TASK_003", "TASK_004"],
+      "acceptance_criteria": [
+        "기본 시즌 3개(비수기, 성수기, 준성수기)가 삽입된다",
+        "샘플 객실 2~3개가 삽입된다",
+        "각 객실의 시즌별 요금이 삽입된다",
+        "기본 설정값(펜션명, 연락처, 계좌정보 등)이 삽입된다",
+        "기본 관리자 계정이 삽입된다 (비밀번호는 bcrypt 해시)"
+      ]
+    },
+    {
+      "id": "TASK_006",
+      "title": "데이터베이스 스키마 문서화",
+      "description": "전체 테이블의 ER 다이어그램 텍스트, 각 테이블의 컬럼 설명, 관계 설명을 포함하는 스키마 문서를 작성한다.",
+      "files_to_create": [
+        "supabase/schema.sql"
+      ],
+      "files_to_modify": [],
+      "dependencies": ["TASK_001", "TASK_002", "TASK_003"],
+      "acceptance_criteria": [
+        "전체 마이그레이션을 합친 완전한 스키마 SQL이 존재한다",
+        "각 테이블, 컬럼에 COMMENT가 달려 있다",
+        "테이블 간 관계가 명확히 표현된다"
+      ]
+    }
+  ]
+}

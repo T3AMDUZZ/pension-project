@@ -1,0 +1,252 @@
+{
+  "plan_name": "PLAN_BACKEND",
+  "description": "Next.js App Router API Routes 기반 펜션 예약 웹사이트 백엔드 API 구현. Supabase(PostgreSQL) 연동, 객실/예약/요금/공지사항/설정/인증/대시보드/이미지 업로드 API와 요금 계산 로직, 관리자 인증 미들웨어를 포함한다.",
+  "tasks": [
+    {
+      "id": "TASK_001",
+      "title": "관리자 인증 미들웨어 및 JWT 유틸리티 구현",
+      "description": "JWT 토큰 생성/검증 유틸리티(src/lib/auth.ts)를 작성하고, Next.js middleware(src/middleware.ts)에서 /admin/**, /api/admin/** 및 관리자 전용 API 경로를 보호한다. JWT 토큰은 httpOnly 쿠키에 저장하며, API 라우트에서 재사용할 수 있는 인증 헬퍼 함수를 제공한다.",
+      "files_to_create": [
+        "src/lib/auth.ts",
+        "src/middleware.ts"
+      ],
+      "files_to_modify": [],
+      "dependencies": [],
+      "acceptance_criteria": [
+        "JWT 토큰 생성(sign) 및 검증(verify) 함수가 구현되어 있다",
+        "미들웨어가 /admin/** 경로 접근 시 JWT 쿠키를 확인한다",
+        "유효하지 않은 토큰이면 로그인 페이지로 리다이렉트한다",
+        "API 라우트에서 사용할 수 있는 requireAdmin 헬퍼가 있다",
+        "JWT_SECRET 환경변수를 사용한다"
+      ]
+    },
+    {
+      "id": "TASK_002",
+      "title": "관리자 인증 API 구현 (auth)",
+      "description": "관리자 로그인/로그아웃/현재 사용자 조회/비밀번호 변경 API를 구현한다. bcrypt로 비밀번호를 해싱하며, 로그인 성공 시 JWT를 httpOnly 쿠키로 설정한다.",
+      "files_to_create": [
+        "src/app/api/auth/login/route.ts",
+        "src/app/api/auth/logout/route.ts",
+        "src/app/api/auth/me/route.ts",
+        "src/app/api/auth/password/route.ts"
+      ],
+      "files_to_modify": [],
+      "dependencies": ["TASK_001"],
+      "acceptance_criteria": [
+        "POST /api/auth/login이 username/password로 인증 후 JWT 쿠키를 설정한다",
+        "POST /api/auth/logout이 JWT 쿠키를 삭제한다",
+        "GET /api/auth/me가 현재 로그인된 관리자 정보를 반환한다",
+        "PUT /api/auth/password가 현재 비밀번호 확인 후 새 비밀번호로 변경한다",
+        "비밀번호는 bcrypt로 해싱하여 저장한다",
+        "잘못된 자격 증명 시 401 응답을 반환한다"
+      ]
+    },
+    {
+      "id": "TASK_003",
+      "title": "객실 API 구현 (rooms)",
+      "description": "객실 CRUD API를 구현한다. 목록/상세는 공개, 등록/수정/삭제는 관리자 인증 필요. 목록은 is_active=true만 반환하고 sort_order로 정렬한다. 상세 조회 시 해당 객실의 가격 정보(room_prices)도 함께 반환한다.",
+      "files_to_create": [
+        "src/app/api/rooms/route.ts",
+        "src/app/api/rooms/[id]/route.ts"
+      ],
+      "files_to_modify": [],
+      "dependencies": ["TASK_001"],
+      "acceptance_criteria": [
+        "GET /api/rooms가 is_active=true인 객실만 sort_order 정렬로 반환한다",
+        "GET /api/rooms/[id]가 객실 상세 정보와 가격 정보를 함께 반환한다",
+        "POST /api/rooms가 관리자 인증 후 객실을 등록한다",
+        "PUT /api/rooms/[id]가 관리자 인증 후 객실을 수정한다",
+        "DELETE /api/rooms/[id]가 관리자 인증 후 객실을 삭제(비활성화)한다",
+        "존재하지 않는 객실 조회 시 404 응답을 반환한다"
+      ]
+    },
+    {
+      "id": "TASK_004",
+      "title": "요금 계산 로직 구현 (pricing)",
+      "description": "체크인~체크아웃 기간의 총 요금을 계산하는 핵심 비즈니스 로직을 구현한다. 각 날짜별로 시즌 판별 → 주중/주말 판별(금,토=주말) → 특가 오버라이드 확인 → room_prices 기본가 적용 → 추가인원 요금 가산 순서로 계산한다.",
+      "files_to_create": [
+        "src/lib/pricing.ts"
+      ],
+      "files_to_modify": [],
+      "dependencies": [],
+      "acceptance_criteria": [
+        "체크인~체크아웃 각 날짜에 대해 시즌을 정확히 판별한다",
+        "금요일, 토요일을 주말로 분류한다",
+        "special_prices 테이블에 오버라이드가 있으면 우선 적용한다",
+        "오버라이드가 없으면 room_prices에서 시즌×요일 가격을 적용한다",
+        "기준인원 초과 시 추가인원 × 추가요금을 가산한다",
+        "각 날짜별 요금 내역과 합산 총액을 반환한다"
+      ]
+    },
+    {
+      "id": "TASK_005",
+      "title": "요금 API 구현 (pricing endpoints)",
+      "description": "요금 계산 API, 시즌 CRUD, 객실별 요금 조회/설정, 특가 설정/삭제 API를 구현한다. 요금 계산 API는 src/lib/pricing.ts의 로직을 사용한다.",
+      "files_to_create": [
+        "src/app/api/pricing/calculate/route.ts",
+        "src/app/api/pricing/seasons/route.ts",
+        "src/app/api/pricing/seasons/[id]/route.ts",
+        "src/app/api/pricing/rooms/[roomId]/route.ts",
+        "src/app/api/pricing/special/route.ts",
+        "src/app/api/pricing/special/[id]/route.ts"
+      ],
+      "files_to_modify": [],
+      "dependencies": ["TASK_001", "TASK_004"],
+      "acceptance_criteria": [
+        "GET /api/pricing/calculate이 room_id, check_in, check_out, guests_count로 요금을 계산한다",
+        "GET /api/pricing/seasons이 시즌 목록을 반환한다",
+        "POST /api/pricing/seasons이 관리자 인증 후 시즌을 등록한다",
+        "PUT /api/pricing/seasons/[id]가 관리자 인증 후 시즌을 수정한다",
+        "DELETE /api/pricing/seasons/[id]가 관리자 인증 후 시즌을 삭제한다",
+        "GET /api/pricing/rooms/[roomId]가 객실별 요금표를 반환한다",
+        "PUT /api/pricing/rooms/[roomId]가 관리자 인증 후 객실 요금을 설정한다",
+        "POST /api/pricing/special이 관리자 인증 후 특가를 설정한다",
+        "DELETE /api/pricing/special/[id]가 관리자 인증 후 특가를 삭제한다"
+      ]
+    },
+    {
+      "id": "TASK_006",
+      "title": "예약 가능 날짜 API 구현 (availability)",
+      "description": "특정 객실의 월별 예약 가능 날짜를 조회하는 API를 구현한다. 해당 월의 각 날짜에 대해 이미 확정/대기중인 예약이 있는지 확인하여 가능/불가 상태를 반환한다.",
+      "files_to_create": [
+        "src/app/api/availability/route.ts"
+      ],
+      "files_to_modify": [],
+      "dependencies": [],
+      "acceptance_criteria": [
+        "GET /api/availability?room_id=xxx&year=2026&month=3이 해당 월의 날짜별 예약 가능 여부를 반환한다",
+        "cancelled, no_show 상태의 예약은 가능으로 처리한다",
+        "응답에 각 날짜의 available(boolean) 상태가 포함된다",
+        "room_id, year, month 파라미터 누락 시 400 응답을 반환한다"
+      ]
+    },
+    {
+      "id": "TASK_007",
+      "title": "예약 API 구현 (reservations)",
+      "description": "예약 CRUD 및 상태 변경 API를 구현한다. 예약 생성 시 예약번호 자동생성(R+YYYYMMDD+4자리순번), 날짜 충돌 검증, 요금 자동계산을 수행한다. 상태 변경은 관리자만 가능하며 정의된 상태 전이 규칙을 따른다.",
+      "files_to_create": [
+        "src/app/api/reservations/route.ts",
+        "src/app/api/reservations/[id]/route.ts",
+        "src/app/api/reservations/[id]/status/route.ts"
+      ],
+      "files_to_modify": [],
+      "dependencies": ["TASK_001", "TASK_004"],
+      "acceptance_criteria": [
+        "GET /api/reservations가 관리자 인증 후 예약 목록을 필터/검색/페이징으로 반환한다",
+        "GET /api/reservations/[id]가 관리자 인증 후 예약 상세를 반환한다",
+        "POST /api/reservations가 예약번호를 R+YYYYMMDD+4자리순번 형식으로 자동생성한다",
+        "POST /api/reservations가 날짜 충돌 시 409 응답을 반환한다",
+        "POST /api/reservations가 요금을 자동계산하여 저장한다",
+        "PUT /api/reservations/[id]/status가 관리자 인증 후 상태를 변경한다",
+        "허용되지 않는 상태 전이 시 400 응답을 반환한다",
+        "DELETE /api/reservations/[id]가 예약을 취소(cancelled) 상태로 변경한다"
+      ]
+    },
+    {
+      "id": "TASK_008",
+      "title": "예약 조회 API 구현 (reservations/check)",
+      "description": "사용자가 예약번호와 연락처(전화번호)로 자신의 예약을 조회할 수 있는 API를 구현한다. 두 조건이 모두 일치하는 경우에만 예약 정보를 반환한다.",
+      "files_to_create": [
+        "src/app/api/reservations/check/route.ts"
+      ],
+      "files_to_modify": [],
+      "dependencies": [],
+      "acceptance_criteria": [
+        "POST /api/reservations/check이 reservation_number와 guest_phone으로 예약을 조회한다",
+        "두 조건이 모두 일치하는 예약 정보를 반환한다",
+        "일치하는 예약이 없으면 404 응답을 반환한다",
+        "필수 파라미터 누락 시 400 응답을 반환한다"
+      ]
+    },
+    {
+      "id": "TASK_009",
+      "title": "공지사항 API 구현 (notices)",
+      "description": "공지사항 CRUD API를 구현한다. 목록/상세는 공개, 작성/수정/삭제는 관리자 인증 필요. 목록은 고정글(is_pinned=true)을 우선 표시하고 페이징을 지원한다.",
+      "files_to_create": [
+        "src/app/api/notices/route.ts",
+        "src/app/api/notices/[id]/route.ts"
+      ],
+      "files_to_modify": [],
+      "dependencies": ["TASK_001"],
+      "acceptance_criteria": [
+        "GET /api/notices가 고정글 우선, 최신순으로 페이징된 공지사항 목록을 반환한다",
+        "GET /api/notices/[id]가 공지사항 상세를 반환하고 조회수를 1 증가시킨다",
+        "POST /api/notices가 관리자 인증 후 공지사항을 작성한다",
+        "PUT /api/notices/[id]가 관리자 인증 후 공지사항을 수정한다",
+        "DELETE /api/notices/[id]가 관리자 인증 후 공지사항을 삭제한다",
+        "페이징 응답에 total, page, limit, totalPages가 포함된다"
+      ]
+    },
+    {
+      "id": "TASK_010",
+      "title": "설정 API 구현 (settings)",
+      "description": "펜션 사이트 설정(펜션 이름, 연락처, 주소, 계좌정보, 약관 등)의 조회/수정 API를 구현한다. 조회는 공개, 수정은 관리자 인증 필요.",
+      "files_to_create": [
+        "src/app/api/settings/route.ts",
+        "src/app/api/settings/[key]/route.ts"
+      ],
+      "files_to_modify": [],
+      "dependencies": ["TASK_001"],
+      "acceptance_criteria": [
+        "GET /api/settings가 전체 설정을 key-value 형태로 반환한다",
+        "GET /api/settings/[key]가 특정 설정값을 반환한다",
+        "PUT /api/settings/[key]가 관리자 인증 후 설정값을 수정한다",
+        "존재하지 않는 설정 키 조회 시 404 응답을 반환한다"
+      ]
+    },
+    {
+      "id": "TASK_011",
+      "title": "대시보드 API 구현 (dashboard)",
+      "description": "관리자 대시보드에 필요한 통계 데이터 API를 구현한다. 오늘 현황(체크인/체크아웃/투숙중/입금대기 건수), 월간 매출, 월간 예약 캘린더 데이터를 제공한다.",
+      "files_to_create": [
+        "src/app/api/dashboard/summary/route.ts",
+        "src/app/api/dashboard/monthly-revenue/route.ts",
+        "src/app/api/dashboard/calendar/route.ts"
+      ],
+      "files_to_modify": [],
+      "dependencies": ["TASK_001"],
+      "acceptance_criteria": [
+        "GET /api/dashboard/summary가 오늘 체크인/체크아웃/투숙중/입금대기 건수를 반환한다",
+        "GET /api/dashboard/monthly-revenue가 월간 매출 데이터를 반환한다",
+        "GET /api/dashboard/calendar?year=2026&month=3이 월간 예약 캘린더 데이터를 반환한다",
+        "모든 대시보드 API는 관리자 인증이 필요하다"
+      ]
+    },
+    {
+      "id": "TASK_012",
+      "title": "이미지 업로드 API 구현 (upload)",
+      "description": "Supabase Storage를 사용한 이미지 업로드/삭제 API를 구현한다. 이미지 파일 유효성 검증(형식, 크기), 고유 파일명 생성, 업로드 후 공개 URL 반환을 처리한다.",
+      "files_to_create": [
+        "src/app/api/upload/route.ts",
+        "src/app/api/upload/[filename]/route.ts"
+      ],
+      "files_to_modify": [],
+      "dependencies": ["TASK_001"],
+      "acceptance_criteria": [
+        "POST /api/upload가 관리자 인증 후 이미지 파일을 Supabase Storage에 업로드한다",
+        "업로드된 이미지의 공개 URL을 응답으로 반환한다",
+        "허용된 이미지 형식(jpg, jpeg, png, webp)만 업로드 가능하다",
+        "최대 파일 크기(5MB)를 초과하면 400 응답을 반환한다",
+        "파일명은 UUID 기반으로 고유하게 생성한다",
+        "DELETE /api/upload/[filename]이 관리자 인증 후 이미지를 삭제한다"
+      ]
+    },
+    {
+      "id": "TASK_013",
+      "title": "API 응답 표준화 및 에러 핸들링",
+      "description": "모든 API의 응답 형식을 표준화하고 공통 에러 핸들링 유틸리티를 구현한다. 성공/실패 응답 포맷, HTTP 상태 코드 규칙, 입력 유효성 검증 헬퍼를 포함한다.",
+      "files_to_create": [
+        "src/lib/api-utils.ts"
+      ],
+      "files_to_modify": [],
+      "dependencies": [],
+      "acceptance_criteria": [
+        "성공 응답 형식이 { success: true, data: ... } 으로 통일된다",
+        "실패 응답 형식이 { success: false, error: { code, message } } 으로 통일된다",
+        "공통 에러 응답 생성 함수(badRequest, unauthorized, notFound, conflict, serverError)가 있다",
+        "입력 유효성 검증 실패 시 상세한 에러 메시지를 반환한다",
+        "예상치 못한 에러 발생 시 500 응답과 함께 에러를 로깅한다"
+      ]
+    }
+  ]
+}

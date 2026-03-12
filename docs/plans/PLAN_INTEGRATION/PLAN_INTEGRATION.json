@@ -1,0 +1,443 @@
+{
+  "plan_name": "PLAN_INTEGRATION",
+  "description": "Next.js App Router + Supabase 기반 펜션 예약 웹사이트의 시스템 통합 및 연동. 사용자 페이지와 관리자 페이지를 API 및 DB와 연결하고, 인증 미들웨어, 카카오맵, 이미지 업로드, 시드 데이터, 에러 처리, SEO 메타데이터를 통합한다.",
+  "tasks": [
+    {
+      "id": "TASK_001",
+      "title": "사용자 메인 페이지 API 연동",
+      "description": "메인 페이지에서 객실 목록 API(/api/rooms), 공지사항 API(/api/notices), 설정 API(/api/settings)를 호출하여 데이터를 렌더링한다. Server Component에서 직접 Supabase를 호출하거나 API Route를 통해 데이터를 가져온다.",
+      "files_to_create": [
+        "src/app/api/rooms/route.ts",
+        "src/app/api/notices/route.ts",
+        "src/app/api/settings/route.ts"
+      ],
+      "files_to_modify": [
+        "src/app/(public)/page.tsx"
+      ],
+      "dependencies": [],
+      "acceptance_criteria": [
+        "메인 페이지에서 활성화된 객실 목록이 이미지와 함께 표시된다",
+        "최신 공지사항(고정 공지 우선)이 메인 페이지에 노출된다",
+        "펜션 기본 정보(이름, 연락처 등)가 설정 API로부터 불러와져 표시된다",
+        "API 호출 실패 시 에러 상태가 사용자에게 안내된다"
+      ]
+    },
+    {
+      "id": "TASK_002",
+      "title": "객실 목록/상세 페이지 API 연동",
+      "description": "객실 목록 페이지에서 전체 활성 객실을 조회하고, 객실 상세 페이지에서 개별 객실 정보와 시즌별 요금 데이터를 함께 가져온다. /api/rooms/[id] 및 /api/rooms/[id]/prices 엔드포인트를 구현한다.",
+      "files_to_create": [
+        "src/app/api/rooms/[id]/route.ts",
+        "src/app/api/rooms/[id]/prices/route.ts",
+        "src/app/(public)/rooms/[id]/page.tsx"
+      ],
+      "files_to_modify": [
+        "src/app/(public)/rooms/page.tsx"
+      ],
+      "dependencies": ["TASK_001"],
+      "acceptance_criteria": [
+        "객실 목록 페이지에서 모든 활성 객실이 카드 형태로 표시된다",
+        "객실 상세 페이지에서 이미지 갤러리, 편의시설, 수용 인원 등이 표시된다",
+        "시즌별 요금표가 객실 상세 페이지에 표시된다",
+        "존재하지 않는 객실 접근 시 404 페이지로 이동한다"
+      ]
+    },
+    {
+      "id": "TASK_003",
+      "title": "예약 달력 및 가능 날짜 API 연동",
+      "description": "예약 달력 컴포넌트에서 /api/reservations/availability 엔드포인트를 호출하여 객실별 예약 가능/마감 날짜를 표시한다. 날짜 선택 시 해당 기간의 요금을 /api/pricing/calculate로 계산한다.",
+      "files_to_create": [
+        "src/app/api/reservations/availability/route.ts",
+        "src/app/api/pricing/calculate/route.ts",
+        "src/components/public/ReservationCalendar.tsx"
+      ],
+      "files_to_modify": [
+        "src/app/(public)/reservation/page.tsx"
+      ],
+      "dependencies": ["TASK_002"],
+      "acceptance_criteria": [
+        "달력에 예약 가능 날짜는 선택 가능 상태로, 마감 날짜는 비활성 상태로 표시된다",
+        "체크인/체크아웃 날짜 선택 시 해당 기간의 총 요금이 자동 계산된다",
+        "주중/주말/성수기 요금이 정확히 반영된다",
+        "특별 요금이 설정된 날짜는 특별 요금으로 계산된다"
+      ]
+    },
+    {
+      "id": "TASK_004",
+      "title": "예약 프로세스 API 연동",
+      "description": "예약 생성 플로우를 완성한다. 날짜 선택 → 인원/객실 선택 → 예약자 정보 입력 → 요금 확인 → 예약 완료 단계를 구현하고, /api/reservations POST 엔드포인트로 예약 데이터를 생성한다.",
+      "files_to_create": [
+        "src/app/api/reservations/route.ts",
+        "src/components/public/ReservationForm.tsx",
+        "src/components/public/ReservationConfirm.tsx",
+        "src/app/(public)/reservation/complete/page.tsx"
+      ],
+      "files_to_modify": [
+        "src/app/(public)/reservation/page.tsx"
+      ],
+      "dependencies": ["TASK_003"],
+      "acceptance_criteria": [
+        "예약 폼에서 투숙객 이름, 연락처, 차량번호, 결제방법을 입력할 수 있다",
+        "예약 확인 단계에서 선택한 객실, 날짜, 인원, 총 요금을 확인할 수 있다",
+        "예약 완료 시 예약번호가 생성되어 표시된다",
+        "중복 예약(동일 객실, 동일 날짜)이 방지된다",
+        "최소 숙박일수 제한이 적용된다(성수기 등)"
+      ]
+    },
+    {
+      "id": "TASK_005",
+      "title": "예약 조회 페이지 API 연동",
+      "description": "예약 조회 페이지에서 예약번호와 투숙객 이름으로 예약을 검색하고, 예약 상태/상세 정보를 표시한다. /api/reservations/check 엔드포인트를 구현한다.",
+      "files_to_create": [
+        "src/app/api/reservations/check/route.ts",
+        "src/components/public/ReservationSearch.tsx",
+        "src/components/public/ReservationDetail.tsx"
+      ],
+      "files_to_modify": [
+        "src/app/(public)/check/page.tsx"
+      ],
+      "dependencies": ["TASK_004"],
+      "acceptance_criteria": [
+        "예약번호와 투숙객 이름으로 예약을 검색할 수 있다",
+        "검색 결과로 예약 상태, 객실명, 체크인/아웃, 결제 정보가 표시된다",
+        "존재하지 않는 예약번호 입력 시 안내 메시지가 표시된다",
+        "예약 상태에 따라 시각적 구분이 된다(대기, 확정, 취소 등)"
+      ]
+    },
+    {
+      "id": "TASK_006",
+      "title": "공지사항 페이지 API 연동",
+      "description": "공지사항 목록 페이지와 상세 페이지를 API와 연동한다. 고정 공지 우선 표시, 페이지네이션을 구현한다. /api/notices/[id] 엔드포인트를 추가한다.",
+      "files_to_create": [
+        "src/app/api/notices/[id]/route.ts",
+        "src/app/(public)/notice/[id]/page.tsx"
+      ],
+      "files_to_modify": [
+        "src/app/(public)/notice/page.tsx"
+      ],
+      "dependencies": ["TASK_001"],
+      "acceptance_criteria": [
+        "공지사항 목록이 최신순으로 표시되며, 고정 공지가 상단에 표시된다",
+        "공지사항 상세 페이지에서 제목, 내용, 작성일이 표시된다",
+        "페이지네이션이 동작한다 (10건씩)",
+        "공지사항이 없을 때 빈 상태 메시지가 표시된다"
+      ]
+    },
+    {
+      "id": "TASK_007",
+      "title": "펜션 소개/오시는 길 페이지 연동",
+      "description": "설정 API로부터 펜션 소개 정보를 가져오고, 카카오맵 JavaScript SDK를 연동하여 펜션 위치를 지도에 표시한다. 길찾기 링크를 제공한다.",
+      "files_to_create": [
+        "src/components/public/KakaoMap.tsx",
+        "src/lib/kakaomap.ts"
+      ],
+      "files_to_modify": [
+        "src/app/(public)/about/page.tsx",
+        "src/app/layout.tsx"
+      ],
+      "dependencies": ["TASK_001"],
+      "acceptance_criteria": [
+        "펜션 소개 정보(이름, 설명, 편의시설 등)가 설정 API로부터 표시된다",
+        "카카오맵에 펜션 위치 마커가 표시된다",
+        "카카오맵 길찾기 링크가 동작한다",
+        "지도가 로드되지 않을 때 대체 텍스트(주소)가 표시된다",
+        "NEXT_PUBLIC_KAKAO_MAP_KEY 환경변수를 사용한다"
+      ]
+    },
+    {
+      "id": "TASK_008",
+      "title": "관리자 로그인 및 인증 API 연동",
+      "description": "관리자 로그인 페이지에서 /api/admin/login 엔드포인트로 인증하고, JWT 토큰을 쿠키에 저장한다. 로그아웃 기능과 세션 유지 로직을 구현한다.",
+      "files_to_create": [
+        "src/app/api/admin/login/route.ts",
+        "src/app/api/admin/logout/route.ts",
+        "src/app/api/admin/session/route.ts",
+        "src/app/admin/login/page.tsx",
+        "src/lib/auth.ts"
+      ],
+      "files_to_modify": [],
+      "dependencies": [],
+      "acceptance_criteria": [
+        "관리자 로그인 페이지에서 아이디/비밀번호를 입력하여 로그인할 수 있다",
+        "로그인 성공 시 JWT 토큰이 httpOnly 쿠키에 저장된다",
+        "잘못된 자격증명 입력 시 에러 메시지가 표시된다",
+        "로그아웃 시 쿠키가 삭제되고 로그인 페이지로 이동한다",
+        "bcrypt로 비밀번호를 비교한다"
+      ]
+    },
+    {
+      "id": "TASK_009",
+      "title": "인증 미들웨어 구현",
+      "description": "Next.js 미들웨어를 구현하여 /admin/** 경로(로그인 페이지 제외)를 보호한다. 유효한 JWT 토큰이 없으면 로그인 페이지로 리다이렉트한다. API의 관리자 전용 엔드포인트도 보호한다.",
+      "files_to_create": [
+        "src/middleware.ts"
+      ],
+      "files_to_modify": [],
+      "dependencies": ["TASK_008"],
+      "acceptance_criteria": [
+        "/admin/** 경로는 인증되지 않은 사용자를 /admin/login으로 리다이렉트한다",
+        "/admin/login 경로는 미들웨어에서 제외된다",
+        "이미 로그인한 사용자가 /admin/login에 접근하면 /admin으로 리다이렉트한다",
+        "/api/admin/** 엔드포인트는 유효한 JWT 토큰이 필요하다",
+        "토큰 만료 시 로그인 페이지로 리다이렉트한다"
+      ]
+    },
+    {
+      "id": "TASK_010",
+      "title": "관리자 대시보드 API 연동",
+      "description": "관리자 대시보드 페이지에서 /api/admin/dashboard 엔드포인트를 호출하여 오늘의 예약, 체크인/체크아웃 현황, 최근 예약 목록, 객실별 상태 등 요약 데이터를 표시한다.",
+      "files_to_create": [
+        "src/app/api/admin/dashboard/route.ts",
+        "src/components/admin/DashboardStats.tsx",
+        "src/components/admin/RecentReservations.tsx",
+        "src/components/admin/RoomStatusOverview.tsx"
+      ],
+      "files_to_modify": [
+        "src/app/admin/page.tsx"
+      ],
+      "dependencies": ["TASK_009"],
+      "acceptance_criteria": [
+        "오늘의 체크인/체크아웃 건수가 표시된다",
+        "전체 예약 현황(대기, 확정, 취소) 건수가 표시된다",
+        "최근 예약 5건이 리스트로 표시된다",
+        "객실별 오늘의 상태(빈 방, 입실, 퇴실 예정)가 표시된다"
+      ]
+    },
+    {
+      "id": "TASK_011",
+      "title": "관리자 예약 관리 API 연동",
+      "description": "관리자 예약 관리 페이지에서 예약 목록 조회(필터/검색/정렬), 예약 상세 보기, 상태 변경, 관리자 메모 수정 등 예약 CRUD를 API와 연동한다.",
+      "files_to_create": [
+        "src/app/api/admin/reservations/route.ts",
+        "src/app/api/admin/reservations/[id]/route.ts",
+        "src/components/admin/ReservationTable.tsx",
+        "src/components/admin/ReservationDetailModal.tsx",
+        "src/components/admin/ReservationStatusBadge.tsx"
+      ],
+      "files_to_modify": [
+        "src/app/admin/reservations/page.tsx"
+      ],
+      "dependencies": ["TASK_009"],
+      "acceptance_criteria": [
+        "예약 목록이 테이블 형태로 표시되며, 날짜/상태/객실 기준으로 필터링할 수 있다",
+        "예약 상세 보기에서 모든 예약 정보를 확인할 수 있다",
+        "예약 상태를 변경할 수 있다 (대기→확정, 확정→취소 등)",
+        "관리자 메모를 입력/수정할 수 있다",
+        "예약 상태 변경이 사용자 예약 조회에 즉시 반영된다"
+      ]
+    },
+    {
+      "id": "TASK_012",
+      "title": "관리자 객실 관리 API 및 이미지 업로드 연동",
+      "description": "관리자 객실 관리 페이지에서 객실 CRUD를 API와 연동한다. Supabase Storage를 활용한 이미지 업로드/삭제 기능을 구현하고, Next.js Image 컴포넌트로 최적화하여 표시한다.",
+      "files_to_create": [
+        "src/app/api/admin/rooms/route.ts",
+        "src/app/api/admin/rooms/[id]/route.ts",
+        "src/app/api/admin/upload/route.ts",
+        "src/components/admin/RoomForm.tsx",
+        "src/components/admin/RoomList.tsx",
+        "src/components/admin/ImageUploader.tsx",
+        "src/lib/storage.ts"
+      ],
+      "files_to_modify": [
+        "src/app/admin/rooms/page.tsx",
+        "next.config.ts"
+      ],
+      "dependencies": ["TASK_009"],
+      "acceptance_criteria": [
+        "객실 목록이 표시되고 정렬 순서를 변경할 수 있다",
+        "객실 등록 폼에서 이름, 설명, 유형, 수용인원, 크기, 편의시설을 입력할 수 있다",
+        "이미지를 드래그앤드롭 또는 파일 선택으로 업로드할 수 있다",
+        "업로드된 이미지가 Supabase Storage에 저장되고 URL이 객실 데이터에 반영된다",
+        "이미지 삭제 시 Storage에서도 삭제된다",
+        "next.config.ts에 Supabase Storage 이미지 도메인이 허용된다",
+        "객실 활성/비활성 토글이 동작한다"
+      ]
+    },
+    {
+      "id": "TASK_013",
+      "title": "관리자 요금 관리 API 연동",
+      "description": "관리자 요금 관리 페이지에서 시즌별 객실 요금, 특별 요금을 설정할 수 있도록 API를 연동한다. 요금 조회/수정 인터페이스를 구현한다.",
+      "files_to_create": [
+        "src/app/api/admin/pricing/route.ts",
+        "src/app/api/admin/pricing/special/route.ts",
+        "src/app/api/admin/seasons/route.ts",
+        "src/components/admin/PricingTable.tsx",
+        "src/components/admin/SpecialPriceForm.tsx",
+        "src/components/admin/SeasonManager.tsx"
+      ],
+      "files_to_modify": [
+        "src/app/admin/pricing/page.tsx"
+      ],
+      "dependencies": ["TASK_009"],
+      "acceptance_criteria": [
+        "시즌별 객실 요금을 매트릭스 형태로 조회/수정할 수 있다",
+        "주중/주말 요금과 추가 인원 요금을 각각 설정할 수 있다",
+        "특별 요금(특정 날짜)을 추가/삭제할 수 있다",
+        "시즌을 추가/수정/삭제할 수 있다",
+        "요금 변경이 사용자 예약 계산에 즉시 반영된다"
+      ]
+    },
+    {
+      "id": "TASK_014",
+      "title": "관리자 공지사항 관리 API 연동",
+      "description": "관리자 공지사항 관리 페이지에서 공지사항 CRUD를 API와 연동한다. 작성, 수정, 삭제, 고정 설정 기능을 구현한다.",
+      "files_to_create": [
+        "src/app/api/admin/notices/route.ts",
+        "src/app/api/admin/notices/[id]/route.ts",
+        "src/components/admin/NoticeForm.tsx",
+        "src/components/admin/NoticeList.tsx"
+      ],
+      "files_to_modify": [
+        "src/app/admin/notices/page.tsx"
+      ],
+      "dependencies": ["TASK_009"],
+      "acceptance_criteria": [
+        "공지사항 목록이 표시되며, 고정/비고정 상태를 확인할 수 있다",
+        "새 공지사항을 작성할 수 있다 (제목, 내용, 고정 여부)",
+        "기존 공지사항을 수정/삭제할 수 있다",
+        "고정 설정을 토글할 수 있다",
+        "관리자 공지 변경이 사용자 공지사항 페이지에 즉시 반영된다"
+      ]
+    },
+    {
+      "id": "TASK_015",
+      "title": "관리자 설정 페이지 API 연동",
+      "description": "관리자 설정 페이지에서 펜션 기본 정보(이름, 주소, 연락처, 계좌정보, 카카오맵 좌표 등)를 조회/수정할 수 있도록 설정 API를 연동한다.",
+      "files_to_create": [
+        "src/app/api/admin/settings/route.ts",
+        "src/components/admin/SettingsForm.tsx"
+      ],
+      "files_to_modify": [
+        "src/app/admin/settings/page.tsx"
+      ],
+      "dependencies": ["TASK_009"],
+      "acceptance_criteria": [
+        "펜션 이름, 주소, 연락처, 카카오맵 좌표를 수정할 수 있다",
+        "입금 계좌 정보(은행, 예금주, 계좌번호)를 수정할 수 있다",
+        "설정 변경이 즉시 저장되고 사용자 페이지에 반영된다",
+        "설정값이 없는 경우 기본값이 표시된다"
+      ]
+    },
+    {
+      "id": "TASK_016",
+      "title": "이미지 업로드 인프라 연동",
+      "description": "Supabase Storage에 이미지 저장용 버킷을 생성하고, 업로드/삭제/URL 생성 유틸리티를 구현한다. Next.js Image 컴포넌트를 활용한 이미지 최적화를 적용한다.",
+      "files_to_create": [
+        "supabase/migrations/005_create_storage_bucket.sql"
+      ],
+      "files_to_modify": [
+        "src/lib/storage.ts",
+        "next.config.ts",
+        ".env.local.example"
+      ],
+      "dependencies": [],
+      "acceptance_criteria": [
+        "Supabase Storage에 'room-images' 버킷이 생성된다",
+        "버킷에 퍼블릭 읽기 접근이 허용된다",
+        "이미지 업로드 시 고유 파일명이 생성된다",
+        "이미지 삭제 함수가 Storage에서 파일을 제거한다",
+        "next.config.ts에 Supabase Storage 도메인이 images.remotePatterns에 등록된다",
+        ".env.local.example에 NEXT_PUBLIC_SUPABASE_URL이 이미지 도메인으로 사용됨이 명시된다"
+      ]
+    },
+    {
+      "id": "TASK_017",
+      "title": "시드 데이터 작성",
+      "description": "초기 관리자 계정(admin/admin1234), 기본 설정값(펜션 정보, 계좌 정보), 샘플 객실 2~3개, 샘플 시즌(비수기/성수기/준성수기), 샘플 공지사항을 포함하는 시드 데이터를 작성한다.",
+      "files_to_create": [
+        "scripts/seed.ts"
+      ],
+      "files_to_modify": [
+        "supabase/seed.sql",
+        "package.json"
+      ],
+      "dependencies": ["TASK_016"],
+      "acceptance_criteria": [
+        "관리자 계정 admin/admin1234가 admin_users 테이블에 삽입된다 (비밀번호는 bcrypt 해시)",
+        "기본 설정값이 settings 테이블에 삽입된다 (pension_name, phone, address, bank_account 등)",
+        "샘플 객실 2~3개가 rooms 테이블에 삽입된다",
+        "시즌 3개(비수기, 성수기, 준성수기)가 seasons 테이블에 삽입된다",
+        "각 객실의 시즌별 요금이 room_prices 테이블에 삽입된다",
+        "샘플 공지사항 2~3개가 notices 테이블에 삽입된다",
+        "npm run seed 명령으로 시드 데이터를 실행할 수 있다"
+      ]
+    },
+    {
+      "id": "TASK_018",
+      "title": "에러 처리 통합",
+      "description": "API 에러 응답 형식을 통일하고({ error: string, code: string }), 프론트엔드 에러 바운더리, 404/500 커스텀 에러 페이지를 구현한다. API 유틸리티에 공통 에러 핸들러를 추가한다.",
+      "files_to_create": [
+        "src/app/not-found.tsx",
+        "src/app/error.tsx",
+        "src/app/(public)/error.tsx",
+        "src/app/admin/error.tsx",
+        "src/lib/api-error.ts",
+        "src/components/ui/ErrorBoundary.tsx"
+      ],
+      "files_to_modify": [
+        "src/lib/utils.ts"
+      ],
+      "dependencies": [],
+      "acceptance_criteria": [
+        "모든 API 에러 응답이 { error: string, code: string } 형식을 따른다",
+        "404 커스텀 에러 페이지가 존재하고 홈으로 돌아가기 링크가 있다",
+        "500 커스텀 에러 페이지가 존재하고 재시도 버튼이 있다",
+        "사용자 페이지와 관리자 페이지에 각각 에러 바운더리가 적용된다",
+        "api-error.ts에 공통 에러 코드 상수가 정의되어 있다 (UNAUTHORIZED, NOT_FOUND, VALIDATION_ERROR, INTERNAL_ERROR 등)"
+      ]
+    },
+    {
+      "id": "TASK_019",
+      "title": "SEO 및 메타데이터 설정",
+      "description": "각 사용자 페이지에 적절한 metadata를 설정하고, Open Graph 태그, robots.txt, sitemap.xml을 생성한다. 동적 메타데이터(객실 상세, 공지사항 상세)도 포함한다.",
+      "files_to_create": [
+        "src/app/robots.ts",
+        "src/app/sitemap.ts"
+      ],
+      "files_to_modify": [
+        "src/app/layout.tsx",
+        "src/app/(public)/page.tsx",
+        "src/app/(public)/rooms/page.tsx",
+        "src/app/(public)/rooms/[id]/page.tsx",
+        "src/app/(public)/reservation/page.tsx",
+        "src/app/(public)/check/page.tsx",
+        "src/app/(public)/about/page.tsx",
+        "src/app/(public)/notice/page.tsx",
+        "src/app/(public)/notice/[id]/page.tsx"
+      ],
+      "dependencies": ["TASK_001", "TASK_002", "TASK_006", "TASK_007"],
+      "acceptance_criteria": [
+        "루트 layout.tsx에 기본 metadata(title template, description)가 설정되어 있다",
+        "각 페이지에 고유한 title과 description이 설정되어 있다",
+        "객실 상세, 공지사항 상세 페이지에 동적 metadata(generateMetadata)가 적용된다",
+        "Open Graph 이미지, title, description 태그가 포함된다",
+        "robots.ts에서 /admin/** 경로가 크롤링 제외된다",
+        "sitemap.ts에서 주요 페이지 URL이 생성된다"
+      ]
+    },
+    {
+      "id": "TASK_020",
+      "title": "최종 통합 테스트 및 빌드 검증",
+      "description": "모든 연동이 완료된 상태에서 전체 플로우를 점검하고, npm run build가 에러 없이 완료되는지 확인한다. TypeScript 타입 에러, 미사용 import, 콘솔 에러 등을 정리한다.",
+      "files_to_create": [],
+      "files_to_modify": [
+        "package.json"
+      ],
+      "dependencies": [
+        "TASK_001", "TASK_002", "TASK_003", "TASK_004", "TASK_005",
+        "TASK_006", "TASK_007", "TASK_008", "TASK_009", "TASK_010",
+        "TASK_011", "TASK_012", "TASK_013", "TASK_014", "TASK_015",
+        "TASK_016", "TASK_017", "TASK_018", "TASK_019"
+      ],
+      "acceptance_criteria": [
+        "npm run build가 에러 없이 완료된다",
+        "npx tsc --noEmit가 타입 에러 없이 통과한다",
+        "사용자 예약 플로우 전체가 동작한다 (메인→객실→예약→완료→조회)",
+        "관리자 플로우 전체가 동작한다 (로그인→대시보드→각 관리 페이지)",
+        "모바일 반응형이 깨지지 않는다",
+        "브라우저 콘솔에 에러가 없다"
+      ]
+    }
+  ]
+}
